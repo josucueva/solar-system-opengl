@@ -6,7 +6,7 @@
 #define PI 3.14159265358979323846
 
 CelestialBody::CelestialBody(float rad, const char* texturePath) 
-    : radius(rad), position(0.0f), rotationAngle(0.0f), rotationSpeed(0.5f),
+    : position(0.0f), radius(rad), rotationAngle(0.0f), rotationSpeed(0.0f),
       orbitRadius(0.0f), orbitSpeed(0.0f), orbitAngle(0.0f), parent(nullptr) {
     
     texture = new Texture(texturePath);

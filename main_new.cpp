@@ -211,11 +211,11 @@ void processInput(GLFWwindow *window) {
         camera.ProcessKeyboard(RIGHT, deltaTime);
 }
 
-void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
+void framebufferSizeCallback(GLFWwindow* /* window */, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
-void mouseCallback(GLFWwindow* window, double xposIn, double yposIn) {
+void mouseCallback(GLFWwindow* /* window */, double xposIn, double yposIn) {
     float xpos = static_cast<float>(xposIn);
     float ypos = static_cast<float>(yposIn);
 
@@ -234,6 +234,6 @@ void mouseCallback(GLFWwindow* window, double xposIn, double yposIn) {
     camera.ProcessMouseMovement(xoffset, yoffset);
 }
 
-void scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
+void scrollCallback(GLFWwindow* /* window */, double /* xoffset */, double yoffset) {
     camera.ProcessMouseScroll(static_cast<float>(yoffset));
 }
