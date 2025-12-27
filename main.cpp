@@ -114,31 +114,25 @@ int main() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount * sizeof(uint), indices, GL_STATIC_DRAW);
 
-    // Position attribute (location = 0)
+    // position (location = 0)
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), (void*)0);
     glEnableVertexAttribArray(0);
     
-    // Normal attribute (location = 1) - offset by 3 floats for position
+    // normal (location = 1)
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
-    // Create VAO for the light source (reuses same VBO and IBO as sphere)
     uint lightVAO;
 
     glGenVertexArrays(1, &lightVAO);
     glBindVertexArray(lightVAO);
 
-    // Bind the same VBO (contains all sphere vertex data)
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    
-    // Bind the same IBO (index buffer binding is per-VAO, so we must bind it here too)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
 
-    // Position attribute only for light cube (we don't need normals for the light source)
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), (void*)0);
     glEnableVertexAttribArray(0);
 
-    // Create background sphere VAO (large sphere with stars texture)
     const vertex* bgVertices = createSphereVertices({0.0f, 0.0f, 0.0f}, 50.0f, STACKS, SECTORS);
     int bgIndexCount = 0;
     uint* bgIndices = createSphereIndices(STACKS, SECTORS, bgIndexCount);
