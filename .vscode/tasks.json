@@ -2,7 +2,29 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "g++ build",
+      "label": "g++ build project",
+      "type": "shell",
+      "command": "g++",
+      "args": [
+        "${workspaceFolder}/main_new.cpp",
+        "${workspaceFolder}/shader.cpp",
+        "${workspaceFolder}/texture.cpp",
+        "${workspaceFolder}/body.cpp",
+        "-o",
+        "${workspaceFolder}/solar_system",
+        "-lGLEW",
+        "-lGL",
+        "-lglfw",
+        "-std=c++11"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": ["$gcc"]
+    },
+    {
+      "label": "g++ build (old main)",
       "type": "shell",
       "command": "g++",
       "args": [
