@@ -10,6 +10,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "includes/stb_image.h"
+
 #include "includes/camera.h"
 
 #define PI 3.14159265358979323846
@@ -54,6 +57,7 @@ uint createShaderProgram(uint vertexShader, uint fragmentShader);
 const vertex* createSphereVertices(vertex center, float radius, const int stacks, const int sectors);
 uint* createSphereIndices(const int stacks, const int sectors, int& indexCount);
 void initLighting();
+uint loadTexture(const char* path);
 
 
 int main() {
@@ -79,10 +83,16 @@ int main() {
     uint lightFS = compileShader(GL_FRAGMENT_SHADER, loadShaderFromFile("shader/light_fs.glsl").c_str());
     uint lightShaderProgram = createShaderProgram(lightVS, lightFS);
 
+    uint textureVS = compileShader(GL_VERTEX_SHADER, loadShaderFromFile("shader/texture_vs.glsl").c_str());
+    uint textureFS = compileShader(GL_FRAGMENT_SHADER, loadShaderFromFile("shader/texture_fs.glsl").c_str());
+    uint textureShaderProgram = createShaderProgram(textureVS, textureFS);
+
     glDeleteShader(colorsVS);
     glDeleteShader(colorsFS);
     glDeleteShader(lightVS);
     glDeleteShader(lightFS);
+    glDeleteShader(textureVS);
+    glDeleteShader(textureFS);
 
     const vertex* vertices = createSphereVertices({0.0f, 0.0f, 0.0f}, 0.5f, STACKS, SECTORS);
     const int vertexCount = (STACKS + 1) * (SECTORS + 1);
@@ -128,6 +138,31 @@ int main() {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), (void*)0);
     glEnableVertexAttribArray(0);
 
+    // Create background sphere VAO (large sphere with stars texture)
+    const vertex* bgVertices = createSphereVertices({0.0f, 0.0f, 0.0f}, 50.0f, STACKS, SECTORS);
+    int bgIndexCount = 0;
+    uint* bgIndices = createSphereIndices(STACKS, SECTORS, bgIndexCount);
+    
+    uint bgVAO, bgVBO, bgIBO;
+    glGenVertexArrays(1, &bgVAO);
+    glGenBuffers(1, &bgVBO);
+    glGenBuffers(1, &bgIBO);
+
+    glBindVertexArray(bgVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, bgVBO);
+    glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(vertex), bgVertices, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bgIBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, bgIndexCount * sizeof(uint), bgIndices, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    uint spaceTexture = loadTexture("assets/textures/2k_stars.jpg");
+
     while(!glfwWindowShouldClose(window)) {
 
         float currentFrame = static_cast<float>(glfwGetTime());
@@ -139,13 +174,25 @@ int main() {
         glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        glm::mat4 view = camera.GetViewMatrix();
+        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
+
+        glDepthMask(GL_FALSE);
+        glUseProgram(textureShaderProgram);
+        glm::mat4 bgModel = glm::mat4(1.0f);
+        glUniformMatrix4fv(glGetUniformLocation(textureShaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(bgModel));
+        glUniformMatrix4fv(glGetUniformLocation(textureShaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
+        glUniformMatrix4fv(glGetUniformLocation(textureShaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+        glBindTexture(GL_TEXTURE_2D, spaceTexture);
+        glBindVertexArray(bgVAO);
+        glDrawElements(GL_TRIANGLES, bgIndexCount, GL_UNSIGNED_INT, 0);
+        glDepthMask(GL_TRUE); // Re-enable depth writing
+
         // draw light source
         glUseProgram(lightShaderProgram);
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, lightPos);
         model = glm::scale(model, glm::vec3(0.2f));
-        glm::mat4 view = camera.GetViewMatrix();
-        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
 
         glUniformMatrix4fv(glGetUniformLocation(lightShaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
         glUniformMatrix4fv(glGetUniformLocation(lightShaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
@@ -175,11 +222,17 @@ int main() {
 
     glDeleteVertexArrays(1, &sphereVAO);
     glDeleteVertexArrays(1, &lightVAO);
+    glDeleteVertexArrays(1, &bgVAO);
     glDeleteBuffers(1, &VBO);
     glDeleteBuffers(1, &IBO);
+    glDeleteBuffers(1, &bgVBO);
+    glDeleteBuffers(1, &bgIBO);
+    glDeleteTextures(1, &spaceTexture);
     
     delete[] vertices;
     delete[] indices;
+    delete[] bgVertices;
+    delete[] bgIndices;
 
     glfwTerminate();
     return 0;
@@ -423,4 +476,38 @@ void mouseCallback(GLFWwindow* window, double xposIn, double yposIn) {
 
 void scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
     camera.ProcessMouseScroll(static_cast<float>(yoffset));
+}
+
+uint loadTexture(const char* path) {
+    uint textureID;
+    glGenTextures(1, &textureID);
+    
+    int width, height, nrChannels;
+    unsigned char *data = stbi_load(path, &width, &height, &nrChannels, 0);
+    if (data) {
+        GLenum format;
+        if (nrChannels == 1)
+            format = GL_RED;
+        else if (nrChannels == 3)
+            format = GL_RGB;
+        else if (nrChannels == 4)
+            format = GL_RGBA;
+        
+        glBindTexture(GL_TEXTURE_2D, textureID);
+        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+        
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        
+        stbi_image_free(data);
+        cout << "Texture loaded: " << path << " (" << width << "x" << height << ")" << endl;
+    } else {
+        cerr << "Failed to load texture: " << path << endl;
+        stbi_image_free(data);
+    }
+    
+    return textureID;
 }
