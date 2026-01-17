@@ -39,3 +39,9 @@
 
 # debug information files
 *.dwo
+
+# visual studio folder
+.vs/
+
+# VS solution folder
+final-graficos/
