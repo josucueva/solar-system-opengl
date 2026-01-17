@@ -1,7 +1,8 @@
-#include "includes/texture.h"
-#define STB_IMAGE_IMPLEMENTATION
-#include "includes/stb_image.h"
+#include "texture.h"
+#include "stb_image.h"
 #include <iostream>
+
+#define STB_IMAGE_IMPLEMENTATION
 
 using namespace std;
 
