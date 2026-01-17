@@ -6,7 +6,7 @@ endif
 
 CXX := g++
 CXXFLAGS := -std=c++11 -Wall -Wextra
-SRCS := main_new.cpp shader.cpp texture.cpp body.cpp
+SRCS := main.cpp includes/shader.cpp includes/texture.cpp includes/body.cpp
 OBJS := $(SRCS:.cpp=.o)
 
 ifeq ($(DETECTED_OS),Windows)

@@ -6,7 +6,7 @@
       "type": "shell",
       "command": "g++",
       "args": [
-        "${workspaceFolder}/main_new.cpp",
+        "${workspaceFolder}/main.cpp",
         "${workspaceFolder}/shader.cpp",
         "${workspaceFolder}/texture.cpp",
         "${workspaceFolder}/body.cpp",
