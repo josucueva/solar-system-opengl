@@ -16,6 +16,20 @@
 #define WINDOW_WIDTH 700
 #define WINDOW_HEIGHT 700
 
+// Sun configuration
+const float SUN_SIZE = 1.0f;
+const char* SUN_TEXTURE = "assets/textures/2k_sun.jpg";
+
+// Background configuration
+const float BACKGROUND_SIZE = 100.0f;
+const char* BACKGROUND_TEXTURE = "assets/textures/2k_stars.jpg";
+
+// Moon configuration
+const float MOON_SIZE = 0.0243f;
+const float MOON_ORBIT_RADIUS = 0.005f;
+const float MOON_ORBIT_SPEED = 1.0f;
+const char* MOON_TEXTURE = "assets/textures/2k_moon.jpg";
+
 using namespace std;
 
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
@@ -62,8 +76,8 @@ int main() {
     Shader colorShader("shader/colors_vs.glsl", "shader/colors_fs.glsl");
     Shader textureShader("shader/texture_vs.glsl", "shader/texture_fs.glsl");
 
-    CelestialBody sun(1.0f, "assets/textures/2k_sun.jpg");
-    CelestialBody background(100.0f, "assets/textures/2k_stars.jpg");
+    CelestialBody sun(SUN_SIZE, SUN_TEXTURE);
+    CelestialBody background(BACKGROUND_SIZE, BACKGROUND_TEXTURE);
 
     std::vector<PlanetData> planetsData = loadPlanetsFromCSV("assets/data/planets.csv");
     std::vector<CelestialBody*> planets;
@@ -79,8 +93,8 @@ int main() {
         }
     }
     
-    CelestialBody moon(0.0243f, "assets/textures/2k_moon.jpg");
-    moon.setOrbit(0.005f, 1.0f);
+    CelestialBody moon(MOON_SIZE, MOON_TEXTURE);
+    moon.setOrbit(MOON_ORBIT_RADIUS, MOON_ORBIT_SPEED);
     if (earthPtr) {
         moon.setParent(earthPtr);
     }
