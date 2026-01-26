@@ -99,21 +99,24 @@ int main() {
         glm::mat4 view = camera.GetViewMatrix();
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 200.0f);
 
+        // Render background (no lighting)
         glDepthMask(GL_FALSE);
+        textureShader.use();
+        textureShader.setBool("isSun", true);
         background.render(textureShader, view, projection);
         glDepthMask(GL_TRUE);
 
+        // Update and render sun (no lighting)
         sun.update(deltaTime);
-        
-        lightShader.use();
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, sun.getPosition());
-        lightShader.setMat4("model", model);
-        lightShader.setMat4("view", view);
-        lightShader.setMat4("projection", projection);
-        
+        textureShader.use();
+        textureShader.setBool("isSun", true);
         sun.render(textureShader, view, projection);
 
+        // Render planets with Phong lighting
+        textureShader.use();
+        textureShader.setBool("isSun", false);
+        textureShader.setVec3("sunPos", sun.getPosition());
+        
         for (auto* planet : planets) {
             planet->update(deltaTime);
             planet->render(textureShader, view, projection);
