@@ -1,6 +1,10 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include <fstream>
+#include <sstream>
+#include <vector>
+#include <string>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -24,6 +28,15 @@ float lastFrame = 0.0f;
 
 glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
+struct PlanetData {
+    std::string name;
+    float orbitSpeed;
+    float orbitRadius;
+    float size;
+    std::string texture;
+};
+
+std::vector<PlanetData> loadPlanetsFromCSV(const std::string& filepath);
 GLFWwindow* initWindow(int width, int height, const char* title);
 bool initGLEW();
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
@@ -52,33 +65,25 @@ int main() {
     CelestialBody sun(1.0f, "assets/textures/2k_sun.jpg");
     CelestialBody background(100.0f, "assets/textures/2k_stars.jpg");
 
-    CelestialBody mercury(0.0349f, "assets/textures/2k_mercury.jpg");
-    mercury.setOrbit(0.0129f, 1.0f);
-
-    CelestialBody venus(0.0866f, "assets/textures/2k_venus_surface.jpg");
-    venus.setOrbit(0.0241f, 0.7316f);
+    std::vector<PlanetData> planetsData = loadPlanetsFromCSV("assets/data/planets.csv");
+    std::vector<CelestialBody*> planets;
+    CelestialBody* earthPtr = nullptr;
     
-    CelestialBody earth(0.0911f, "assets/textures/2k_uranus.jpg");
-    earth.setOrbit(0.0333f, 0.6221f);
+    for (const auto& planetData : planetsData) {
+        CelestialBody* planet = new CelestialBody(planetData.size, planetData.texture.c_str());
+        planet->setOrbit(planetData.orbitRadius, planetData.orbitSpeed);
+        planets.push_back(planet);
+        
+        if (planetData.name == "Earth") {
+            earthPtr = planet;
+        }
+    }
     
     CelestialBody moon(0.0243f, "assets/textures/2k_moon.jpg");
     moon.setOrbit(0.005f, 1.0f);
-    moon.setParent(&earth);
-
-    CelestialBody mars(0.0485f, "assets/textures/2k_mars.jpg");
-    mars.setOrbit(0.0507f, 0.5028f);
-
-    CelestialBody jupiter(1.0f, "assets/textures/2k_jupiter.jpg");
-    jupiter.setOrbit(0.1732f, 0.273f);
-
-    CelestialBody saturn(0.8329f, "assets/textures/2k_saturn.jpg");
-    saturn.setOrbit(0.319f, 0.2024f);
-
-    CelestialBody uranus(0.3628f, "assets/textures/2k_uranus.jpg");
-    uranus.setOrbit(0.6387f, 0.1423f);
-
-    CelestialBody neptune(0.3522f, "assets/textures/2k_neptune.jpg");
-    neptune.setOrbit(0.1f, 0.1134f);
+    if (earthPtr) {
+        moon.setParent(earthPtr);
+    }
 
     while (!glfwWindowShouldClose(window)) {
 
@@ -109,35 +114,20 @@ int main() {
         
         sun.render(textureShader, view, projection);
 
-        mercury.update(deltaTime);
-        mercury.render(textureShader, view, projection);
-
-        venus.update(deltaTime);
-        venus.render(textureShader, view, projection);
-        
-        earth.update(deltaTime);
-        earth.render(textureShader, view, projection);
+        for (auto* planet : planets) {
+            planet->update(deltaTime);
+            planet->render(textureShader, view, projection);
+        }
 
         moon.update(deltaTime);
         moon.render(textureShader, view, projection);
-        
-        mars.update(deltaTime);
-        mars.render(textureShader, view, projection);
-
-        jupiter.update(deltaTime);
-        jupiter.render(textureShader, view, projection);
-
-        saturn.update(deltaTime);
-        saturn.render(textureShader, view, projection);
-
-        uranus.update(deltaTime);
-        uranus.render(textureShader, view, projection);
-
-        neptune.update(deltaTime);
-        neptune.render(textureShader, view, projection);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
+    }
+
+    for (auto* planet : planets) {
+        delete planet;
     }
 
     glfwTerminate();
@@ -236,4 +226,37 @@ void mouseCallback(GLFWwindow* /* window */, double xposIn, double yposIn) {
 
 void scrollCallback(GLFWwindow* /* window */, double /* xoffset */, double yoffset) {
     camera.ProcessMouseScroll(static_cast<float>(yoffset));
+}
+
+std::vector<PlanetData> loadPlanetsFromCSV(const std::string& filepath) {
+    std::vector<PlanetData> planets;
+    std::ifstream file(filepath);
+    
+    if (!file.is_open()) {
+        std::cerr << "Failed to open " << filepath << std::endl;
+        return planets;
+    }
+    
+    std::string line;
+    std::getline(file, line); // Skip header
+    
+    while (std::getline(file, line)) {
+        std::stringstream ss(line);
+        PlanetData planet;
+        std::string token;
+        
+        std::getline(ss, planet.name, ',');
+        std::getline(ss, token, ',');
+        planet.orbitSpeed = std::stof(token);
+        std::getline(ss, token, ',');
+        planet.orbitRadius = std::stof(token);
+        std::getline(ss, token, ',');
+        planet.size = std::stof(token);
+        std::getline(ss, planet.texture, ',');
+        
+        planets.push_back(planet);
+    }
+    
+    file.close();
+    return planets;
 }
