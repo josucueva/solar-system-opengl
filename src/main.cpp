@@ -24,14 +24,19 @@ using namespace glm;
 const float SUN_SIZE = 1.0f;
 const char *SUN_TEXTURE = "assets/textures/2k_sun.jpg";
 
+// scale configuration
+const float PLANET_SIZE_SCALE = 1.0f;
+const float DISTANCE_SCALE = 1.0f;
+const float SPEED_SCALE = 1.0f;
+
 // background properties
-const float BACKGROUND_SIZE = 100.0f;
+const float BACKGROUND_SIZE = 500.0f;
 const char *BACKGROUND_TEXTURE = "assets/textures/2k_stars_milky_way.jpg";
 
 // moon properties
-const float MOON_SIZE = 0.0243f;
-const float MOON_ORBIT_RADIUS = 0.0025f;
-const float MOON_ORBIT_SPEED = 1.0f;
+const float MOON_SIZE = 0.0243f * PLANET_SIZE_SCALE;
+const float MOON_ORBIT_RADIUS = 0.0025f * DISTANCE_SCALE;
+const float MOON_ORBIT_SPEED = 1.0f * SPEED_SCALE;
 const char *MOON_TEXTURE = "assets/textures/2k_moon.jpg";
 
 // orbit rendering
@@ -43,13 +48,13 @@ const vec3 LIGHT_AMBIENT = vec3(0.15f, 0.15f, 0.15f);
 const vec3 LIGHT_DIFFUSE = vec3(1.0f, 1.0f, 1.0f);
 const vec3 LIGHT_SPECULAR = vec3(1.0f, 1.0f, 1.0f);
 
-// default planet material (rocky planets)
+// rocky planet material
 const vec3 ROCKY_KA = vec3(0.25f, 0.25f, 0.25f);
 const vec3 ROCKY_KD = vec3(0.8f, 0.8f, 0.8f);
 const vec3 ROCKY_KS = vec3(0.3f, 0.3f, 0.3f);
 const float ROCKY_SHININESS = 32.0f;
 
-// gas giant material (Jupiter, Saturn, Uranus, Neptune)
+// gas giant material
 const vec3 GAS_KA = vec3(0.3f, 0.3f, 0.3f);
 const vec3 GAS_KD = vec3(0.9f, 0.9f, 0.9f);
 const vec3 GAS_KS = vec3(0.5f, 0.5f, 0.5f);
@@ -102,7 +107,8 @@ int main() {
   Shader textureShader("shaders/texture_vs.glsl", "shaders/texture_fs.glsl");
   Shader orbitShader("shaders/orbit_vs.glsl", "shaders/orbit_fs.glsl");
 
-  CelestialBody sun(SUN_SIZE, SUN_TEXTURE);
+  // scale sun size for visibility (sun is actually 109x Earth diameter)
+  CelestialBody sun(SUN_SIZE * PLANET_SIZE_SCALE, SUN_TEXTURE);
   sun.setRotationSpeed(10.0f);
 
   CelestialBody background(BACKGROUND_SIZE, BACKGROUND_TEXTURE);
@@ -114,9 +120,13 @@ int main() {
   CelestialBody *earthPtr = nullptr;
 
   for (const auto &planetData : planetsData) {
-    CelestialBody *planet =
-        new CelestialBody(planetData.size, planetData.texture.c_str());
-    planet->setOrbit(planetData.orbitRadius, planetData.orbitSpeed);
+    // apply size scaling for visibility
+    CelestialBody *planet = new CelestialBody(
+        planetData.size * PLANET_SIZE_SCALE, planetData.texture.c_str());
+
+    // apply distance and speed scaling
+    planet->setOrbit(planetData.orbitRadius * DISTANCE_SCALE,
+                     planetData.orbitSpeed * SPEED_SCALE);
     planet->setRotationSpeed(planetData.rotationSpeed);
 
     // assign material properties based on planet type
@@ -129,7 +139,8 @@ int main() {
     planets.push_back(planet);
 
     // create orbit path
-    Orbit *orbit = new Orbit(planetData.orbitRadius * 100, ORBIT_COLOR);
+    Orbit *orbit =
+        new Orbit(planetData.orbitRadius * DISTANCE_SCALE * 100, ORBIT_COLOR);
     orbits.push_back(orbit);
 
     if (planetData.name == "Earth") {
@@ -159,7 +170,7 @@ int main() {
     mat4 view = camera.GetViewMatrix();
     mat4 projection =
         perspective(radians(camera.Zoom),
-                    (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 200.0f);
+                    (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 2000.0f);
 
     // render background
     glDepthMask(GL_FALSE);

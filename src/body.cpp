@@ -35,8 +35,8 @@ CelestialBody::~CelestialBody() {
 }
 
 void CelestialBody::setOrbit(float orbRadius, float orbSpeed) {
-  orbitRadius = orbRadius * 100;
-  orbitSpeed = orbSpeed * 50;
+  orbitRadius = orbRadius;
+  orbitSpeed = orbSpeed;
 }
 
 void CelestialBody::setRotationSpeed(float speed) { rotationSpeed = speed; }

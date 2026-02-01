@@ -37,9 +37,10 @@ void main()
     vec3 viewDir = normalize(viewPos - FragPos);
     vec3 reflectDir = reflect(-lightDir, norm);
     
-    // distance attenuation
+    // distance attenuation (adjusted for astronomical distances)
     float distance = length(sunPos - FragPos);
-    float attenuation = 1 + 0.01 * distance + 0.001 * distance * distance;
+    // weaker attenuation for space: constant + linear term
+    float attenuation = 1.0 + 0.00002 * distance;
     
     // ambient component
     vec3 I_ambient = material_Ka * light_La;
