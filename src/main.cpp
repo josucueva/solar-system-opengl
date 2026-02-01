@@ -72,6 +72,7 @@ struct PlanetData {
   float size;
   string texture;
   float rotationSpeed;
+  string type;
 };
 
 vector<PlanetData> loadPlanetsFromCSV(const string &filepath);
@@ -119,8 +120,7 @@ int main() {
     planet->setRotationSpeed(planetData.rotationSpeed);
 
     // assign material properties based on planet type
-    if (planetData.name == "Jupiter" || planetData.name == "Saturn" ||
-        planetData.name == "Uranus" || planetData.name == "Neptune") {
+    if (planetData.type == "gas") {
       planet->setMaterial(GAS_KA, GAS_KD, GAS_KS, GAS_SHININESS);
     } else {
       planet->setMaterial(ROCKY_KA, ROCKY_KD, ROCKY_KS, ROCKY_SHININESS);
@@ -338,6 +338,7 @@ vector<PlanetData> loadPlanetsFromCSV(const string &filepath) {
     getline(ss, planet.texture, ',');
     getline(ss, token, ',');
     planet.rotationSpeed = stof(token);
+    getline(ss, planet.type, ',');
 
     planets.push_back(planet);
   }
