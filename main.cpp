@@ -12,6 +12,7 @@
 #include "includes/shader.h"
 #include "includes/texture.h"
 #include "includes/body.h"
+#include "includes/orbit.h"
 
 #define WINDOW_WIDTH 700
 #define WINDOW_HEIGHT 700
@@ -76,6 +77,7 @@ int main() {
     Shader lightShader("shader/light_vs.glsl", "shader/light_fs.glsl");
     Shader colorShader("shader/colors_vs.glsl", "shader/colors_fs.glsl");
     Shader textureShader("shader/texture_vs.glsl", "shader/texture_fs.glsl");
+    Shader orbitShader("shader/orbit_vs.glsl", "shader/orbit_fs.glsl");
 
     CelestialBody sun(SUN_SIZE, SUN_TEXTURE);
     sun.setRotationSpeed(10.0f);  // Sol con rotación lenta
@@ -84,6 +86,7 @@ int main() {
 
     std::vector<PlanetData> planetsData = loadPlanetsFromCSV("assets/data/planets.csv");
     std::vector<CelestialBody*> planets;
+    std::vector<Orbit*> orbits;
     CelestialBody* earthPtr = nullptr;
     
     for (const auto& planetData : planetsData) {
@@ -91,6 +94,10 @@ int main() {
         planet->setOrbit(planetData.orbitRadius, planetData.orbitSpeed);
         planet->setRotationSpeed(planetData.rotationSpeed);
         planets.push_back(planet);
+        
+        // Create orbit circle for this planet
+        Orbit* orbit = new Orbit(planetData.orbitRadius * 100, glm::vec3(1.0f, 1.0f, 1.0f));
+        orbits.push_back(orbit);
         
         if (planetData.name == "Earth") {
             earthPtr = planet;
@@ -127,6 +134,11 @@ int main() {
         sun.update(deltaTime);
         sun.render(textureShader, view, projection);
 
+        // Render orbit lines
+        for (auto* orbit : orbits) {
+            orbit->render(orbitShader, view, projection);
+        }
+
         // Setup light shader for planets with Phong lighting
         lightShader.use();
         lightShader.setVec3("sunPos", sun.getPosition());
@@ -147,6 +159,10 @@ int main() {
 
     for (auto* planet : planets) {
         delete planet;
+    }
+    
+    for (auto* orbit : orbits) {
+        delete orbit;
     }
 
     glfwTerminate();
