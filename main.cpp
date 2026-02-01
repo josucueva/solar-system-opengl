@@ -31,6 +31,10 @@ const float MOON_ORBIT_RADIUS = 0.0025f;
 const float MOON_ORBIT_SPEED = 1.0f;
 const char* MOON_TEXTURE = "assets/textures/2k_moon.jpg";
 
+// Orbit configuration
+const glm::vec3 ORBIT_COLOR = glm::vec3(1.0f, 1.0f, 1.0f);  // White
+const bool DRAW_ORBITS = true;
+
 using namespace std;
 
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
@@ -96,7 +100,7 @@ int main() {
         planets.push_back(planet);
         
         // Create orbit circle for this planet
-        Orbit* orbit = new Orbit(planetData.orbitRadius * 100, glm::vec3(1.0f, 1.0f, 1.0f));
+        Orbit* orbit = new Orbit(planetData.orbitRadius * 100, ORBIT_COLOR);
         orbits.push_back(orbit);
         
         if (planetData.name == "Earth") {
@@ -135,8 +139,10 @@ int main() {
         sun.render(textureShader, view, projection);
 
         // Render orbit lines
-        for (auto* orbit : orbits) {
-            orbit->render(orbitShader, view, projection);
+        if (DRAW_ORBITS) {
+            for (auto* orbit : orbits) {
+                orbit->render(orbitShader, view, projection);
+            }
         }
 
         // Setup light shader for planets with Phong lighting
