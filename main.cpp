@@ -4,7 +4,7 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
-#include <string>
+#include <string>   
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -22,11 +22,11 @@ const char* SUN_TEXTURE = "assets/textures/2k_sun.jpg";
 
 // Background configuration
 const float BACKGROUND_SIZE = 100.0f;
-const char* BACKGROUND_TEXTURE = "assets/textures/2k_stars.jpg";
+const char* BACKGROUND_TEXTURE = "assets/textures/2k_stars_milky_way.jpg";
 
 // Moon configuration
 const float MOON_SIZE = 0.0243f;
-const float MOON_ORBIT_RADIUS = 0.005f;
+const float MOON_ORBIT_RADIUS = 0.0025f;
 const float MOON_ORBIT_SPEED = 1.0f;
 const char* MOON_TEXTURE = "assets/textures/2k_moon.jpg";
 

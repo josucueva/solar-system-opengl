@@ -1,9 +1,9 @@
 planet,orbit_speed,orbit_radius,size,texture,rotation_speed
-Mercury,0.0,0.0129,0.0349,assets/textures/2k_mercury.jpg,20.0
-Venus,0.0,0.0241,0.0866,assets/textures/2k_venus_surface.jpg,-15.0
-Earth,0.0,0.0333,0.0911,assets/textures/2k_earth_daymap.jpg,360.0
-Mars,0.0,0.0507,0.0485,assets/textures/2k_mars.jpg,350.0
-Jupiter,0.0,0.1732,1.0,assets/textures/2k_jupiter.jpg,870.0
-Saturn,0.0,0.319,0.8329,assets/textures/2k_saturn.jpg,810.0
-Uranus,0.0,0.6387,0.3628,assets/textures/2k_uranus.jpg,-500.0
-Neptune,0.0,1.0,0.3522,assets/textures/2k_neptune.jpg,540.0
+Mercury,1.0,0.0129,0.0349,assets/textures/2k_mercury.jpg,20.0
+Venus,0.7316,0.0241,0.0866,assets/textures/2k_venus_surface.jpg,-15.0
+Earth,0.6221,0.0333,0.0911,assets/textures/2k_earth_daymap.jpg,360.0
+Mars,0.5028,0.0507,0.0485,assets/textures/2k_mars.jpg,350.0
+Jupiter,0.273,0.1732,1.0,assets/textures/2k_jupiter.jpg,870.0
+Saturn,0.2024,0.319,0.8329,assets/textures/2k_saturn.jpg,810.0
+Uranus,0.1423,0.6387,0.3628,assets/textures/2k_uranus.jpg,-500.0
+Neptune,0.1134,1.0,0.3522,assets/textures/2k_neptune.jpg,540.0
