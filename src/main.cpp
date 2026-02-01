@@ -17,27 +17,45 @@
 #define WINDOW_WIDTH 700
 #define WINDOW_HEIGHT 700
 
-// Sun configuration
+using namespace std;
+using namespace glm;
+
+// sun properties
 const float SUN_SIZE = 1.0f;
 const char *SUN_TEXTURE = "assets/textures/2k_sun.jpg";
 
-// Background configuration
+// background properties
 const float BACKGROUND_SIZE = 100.0f;
 const char *BACKGROUND_TEXTURE = "assets/textures/2k_stars_milky_way.jpg";
 
-// Moon configuration
+// moon properties
 const float MOON_SIZE = 0.0243f;
 const float MOON_ORBIT_RADIUS = 0.0025f;
 const float MOON_ORBIT_SPEED = 1.0f;
 const char *MOON_TEXTURE = "assets/textures/2k_moon.jpg";
 
-// Orbit configuration
-const glm::vec3 ORBIT_COLOR = glm::vec3(1.0f, 1.0f, 1.0f); // White
+// orbit rendering
+const vec3 ORBIT_COLOR = vec3(1.0f, 1.0f, 1.0f);
 const bool DRAW_ORBITS = true;
 
-using namespace std;
+// sun light intensities
+const vec3 LIGHT_AMBIENT = vec3(0.15f, 0.15f, 0.15f);
+const vec3 LIGHT_DIFFUSE = vec3(1.0f, 1.0f, 1.0f);
+const vec3 LIGHT_SPECULAR = vec3(1.0f, 1.0f, 1.0f);
 
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+// default planet material (rocky planets)
+const vec3 ROCKY_KA = vec3(0.25f, 0.25f, 0.25f);
+const vec3 ROCKY_KD = vec3(0.8f, 0.8f, 0.8f);
+const vec3 ROCKY_KS = vec3(0.3f, 0.3f, 0.3f);
+const float ROCKY_SHININESS = 32.0f;
+
+// gas giant material (Jupiter, Saturn, Uranus, Neptune)
+const vec3 GAS_KA = vec3(0.3f, 0.3f, 0.3f);
+const vec3 GAS_KD = vec3(0.9f, 0.9f, 0.9f);
+const vec3 GAS_KS = vec3(0.5f, 0.5f, 0.5f);
+const float GAS_SHININESS = 64.0f;
+
+Camera camera(vec3(0.0f, 0.0f, 3.0f));
 float lastX = WINDOW_WIDTH / 2.0f;
 float lastY = WINDOW_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -45,18 +63,18 @@ bool firstMouse = true;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
-glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+vec3 lightPos(1.2f, 1.0f, 2.0f);
 
 struct PlanetData {
-  std::string name;
+  string name;
   float orbitSpeed;
   float orbitRadius;
   float size;
-  std::string texture;
+  string texture;
   float rotationSpeed;
 };
 
-std::vector<PlanetData> loadPlanetsFromCSV(const std::string &filepath);
+vector<PlanetData> loadPlanetsFromCSV(const string &filepath);
 GLFWwindow *initWindow(int width, int height, const char *title);
 bool initGLEW();
 void framebufferSizeCallback(GLFWwindow *window, int width, int height);
@@ -84,14 +102,14 @@ int main() {
   Shader orbitShader("shaders/orbit_vs.glsl", "shaders/orbit_fs.glsl");
 
   CelestialBody sun(SUN_SIZE, SUN_TEXTURE);
-  sun.setRotationSpeed(10.0f); // Sol con rotación lenta
+  sun.setRotationSpeed(10.0f);
 
   CelestialBody background(BACKGROUND_SIZE, BACKGROUND_TEXTURE);
 
-  std::vector<PlanetData> planetsData =
+  vector<PlanetData> planetsData =
       loadPlanetsFromCSV("assets/data/planets.csv");
-  std::vector<CelestialBody *> planets;
-  std::vector<Orbit *> orbits;
+  vector<CelestialBody *> planets;
+  vector<Orbit *> orbits;
   CelestialBody *earthPtr = nullptr;
 
   for (const auto &planetData : planetsData) {
@@ -99,9 +117,18 @@ int main() {
         new CelestialBody(planetData.size, planetData.texture.c_str());
     planet->setOrbit(planetData.orbitRadius, planetData.orbitSpeed);
     planet->setRotationSpeed(planetData.rotationSpeed);
+
+    // assign material properties based on planet type
+    if (planetData.name == "Jupiter" || planetData.name == "Saturn" ||
+        planetData.name == "Uranus" || planetData.name == "Neptune") {
+      planet->setMaterial(GAS_KA, GAS_KD, GAS_KS, GAS_SHININESS);
+    } else {
+      planet->setMaterial(ROCKY_KA, ROCKY_KD, ROCKY_KS, ROCKY_SHININESS);
+    }
+
     planets.push_back(planet);
 
-    // Create orbit circle for this planet
+    // create orbit path
     Orbit *orbit = new Orbit(planetData.orbitRadius * 100, ORBIT_COLOR);
     orbits.push_back(orbit);
 
@@ -112,7 +139,8 @@ int main() {
 
   CelestialBody moon(MOON_SIZE, MOON_TEXTURE);
   moon.setOrbit(MOON_ORBIT_RADIUS, MOON_ORBIT_SPEED);
-  moon.setRotationSpeed(50.0f); // Luna con rotación
+  moon.setRotationSpeed(50.0f);
+  moon.setMaterial(ROCKY_KA, ROCKY_KD, ROCKY_KS, ROCKY_SHININESS);
   if (earthPtr) {
     moon.setParent(earthPtr);
   }
@@ -128,38 +156,44 @@ int main() {
     glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glm::mat4 view = camera.GetViewMatrix();
-    glm::mat4 projection = glm::perspective(
-        glm::radians(camera.Zoom), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT,
-        0.1f, 200.0f);
+    mat4 view = camera.GetViewMatrix();
+    mat4 projection =
+        perspective(radians(camera.Zoom),
+                    (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 200.0f);
 
-    // Render background with texture shader (no lighting)
+    // render background
     glDepthMask(GL_FALSE);
     background.render(textureShader, view, projection);
     glDepthMask(GL_TRUE);
 
-    // Render sun with texture shader (no lighting)
+    // render sun
     sun.update(deltaTime);
     sun.render(textureShader, view, projection);
 
-    // Render orbit lines
+    // render orbit paths
     if (DRAW_ORBITS) {
       for (auto *orbit : orbits) {
         orbit->render(orbitShader, view, projection);
       }
     }
 
-    // Setup light shader for planets with Phong lighting
+    // setup lighting from sun
     lightShader.use();
     lightShader.setVec3("sunPos", sun.getPosition());
+    lightShader.setVec3("viewPos", camera.Position);
 
-    // Render planets with light shader
+    // set light properties (from the sun)
+    lightShader.setVec3("light_La", LIGHT_AMBIENT);
+    lightShader.setVec3("light_Ld", LIGHT_DIFFUSE);
+    lightShader.setVec3("light_Le", LIGHT_SPECULAR);
+
+    // render planets
     for (auto *planet : planets) {
       planet->update(deltaTime);
       planet->render(lightShader, view, projection);
     }
 
-    // Render moon with light shader
+    // render moon
     moon.update(deltaTime);
     moon.render(lightShader, view, projection);
 
@@ -277,33 +311,33 @@ void scrollCallback(GLFWwindow * /* window */, double /* xoffset */,
   camera.ProcessMouseScroll(static_cast<float>(yoffset));
 }
 
-std::vector<PlanetData> loadPlanetsFromCSV(const std::string &filepath) {
-  std::vector<PlanetData> planets;
-  std::ifstream file(filepath);
+vector<PlanetData> loadPlanetsFromCSV(const string &filepath) {
+  vector<PlanetData> planets;
+  ifstream file(filepath);
 
   if (!file.is_open()) {
-    std::cerr << "Failed to open " << filepath << std::endl;
+    cerr << "Failed to open " << filepath << endl;
     return planets;
   }
 
-  std::string line;
-  std::getline(file, line); // Skip header
+  string line;
+  getline(file, line); // skip header
 
-  while (std::getline(file, line)) {
-    std::stringstream ss(line);
+  while (getline(file, line)) {
+    stringstream ss(line);
     PlanetData planet;
-    std::string token;
+    string token;
 
-    std::getline(ss, planet.name, ',');
-    std::getline(ss, token, ',');
-    planet.orbitSpeed = std::stof(token);
-    std::getline(ss, token, ',');
-    planet.orbitRadius = std::stof(token);
-    std::getline(ss, token, ',');
-    planet.size = std::stof(token);
-    std::getline(ss, planet.texture, ',');
-    std::getline(ss, token, ',');
-    planet.rotationSpeed = std::stof(token);
+    getline(ss, planet.name, ',');
+    getline(ss, token, ',');
+    planet.orbitSpeed = stof(token);
+    getline(ss, token, ',');
+    planet.orbitRadius = stof(token);
+    getline(ss, token, ',');
+    planet.size = stof(token);
+    getline(ss, planet.texture, ',');
+    getline(ss, token, ',');
+    planet.rotationSpeed = stof(token);
 
     planets.push_back(planet);
   }

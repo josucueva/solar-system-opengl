@@ -16,14 +16,14 @@ Orbit::~Orbit() {
 }
 
 void Orbit::setupOrbit() {
-  // Create circle vertices in XZ plane
+  // create circle vertices
   float *vertices = new float[SEGMENTS * 3];
 
   for (int i = 0; i < SEGMENTS; i++) {
     float angle = (2.0f * PI * i) / SEGMENTS;
-    vertices[i * 3 + 0] = radius * cos(angle); // x
-    vertices[i * 3 + 1] = 0.0f;                // y (flat on XZ plane)
-    vertices[i * 3 + 2] = radius * sin(angle); // z
+    vertices[i * 3 + 0] = radius * cos(angle);
+    vertices[i * 3 + 1] = 0.0f;
+    vertices[i * 3 + 2] = radius * sin(angle);
   }
 
   glGenVertexArrays(1, &VAO);
