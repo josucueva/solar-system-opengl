@@ -6,16 +6,21 @@
       "type": "shell",
       "command": "g++",
       "args": [
-        "${workspaceFolder}/main.cpp",
-        "${workspaceFolder}/shader.cpp",
-        "${workspaceFolder}/texture.cpp",
-        "${workspaceFolder}/body.cpp",
+        "-std=c++11",
+        "-Wall",
+        "-Wextra",
+        "-Iinclude",
+        "-Iexternal",
+        "${workspaceFolder}/src/main.cpp",
+        "${workspaceFolder}/src/shader.cpp",
+        "${workspaceFolder}/src/texture.cpp",
+        "${workspaceFolder}/src/body.cpp",
+        "${workspaceFolder}/src/orbit.cpp",
         "-o",
-        "${workspaceFolder}/solar_system",
+        "${workspaceFolder}/bin/solar_system",
         "-lGLEW",
         "-lGL",
-        "-lglfw",
-        "-std=c++11"
+        "-lglfw"
       ],
       "group": {
         "kind": "build",
@@ -28,9 +33,12 @@
       "type": "shell",
       "command": "g++",
       "args": [
-        "${workspaceFolder}/main.cpp",
+        "-std=c++11",
+        "-Iinclude",
+        "-Iexternal",
+        "${workspaceFolder}/src/main.cpp",
         "-o",
-        "${workspaceFolder}/main",
+        "${workspaceFolder}/bin/main",
         "-lGLEW",
         "-lGL",
         "-lglfw"
@@ -48,6 +56,8 @@
       "args": [
         "-fdiagnostics-color=always",
         "-g",
+        "-Iinclude",
+        "-Iexternal",
         "${file}",
         "-o",
         "${fileDirname}/${fileBasenameNoExtension}",

@@ -49,3 +49,6 @@ final-graficos/
 # other files
 main
 solar_system*
+# Build directories
+build/
+bin/

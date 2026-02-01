@@ -5,20 +5,20 @@ else
 endif
 
 CXX := g++
-CXXFLAGS := -std=c++11 -Wall -Wextra
-SRCS := main.cpp includes/shader.cpp includes/texture.cpp includes/body.cpp
-OBJS := $(SRCS:.cpp=.o)
+CXXFLAGS := -std=c++11 -Wall -Wextra -Iinclude -Iexternal
+SRCS := src/main.cpp src/shader.cpp src/texture.cpp src/body.cpp src/orbit.cpp
+OBJS := $(patsubst src/%.cpp,build/%.o,$(SRCS))
 
 ifeq ($(DETECTED_OS),Windows)
-    TARGET := solar_system.exe
+    TARGET := bin/solar_system.exe
     RM := del /Q
     LIBS := -lglew32 -lopengl32 -lglfw3 -lgdi32
 else ifeq ($(DETECTED_OS),Linux)
-    TARGET := solar_system
+    TARGET := bin/solar_system
     RM := rm -f
     LIBS := -lGLEW -lGL -lglfw
 else ifeq ($(DETECTED_OS),Darwin)
-    TARGET := solar_system
+    TARGET := bin/solar_system
     RM := rm -f
     LIBS := -lGLEW -lglfw -framework OpenGL
 endif
@@ -28,14 +28,15 @@ all: $(TARGET)
 $(TARGET): $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS)
 
-%.o: %.cpp
+build/%.o: src/%.cpp
+	@mkdir -p build
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
 ifeq ($(DETECTED_OS),Windows)
-	$(RM) $(OBJS) $(TARGET)
+	$(RM) build\\*.o bin\\$(TARGET)
 else
-	$(RM) $(OBJS) $(TARGET)
+	$(RM) build/*.o $(TARGET)
 endif
 
 run: $(TARGET)
