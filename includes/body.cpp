@@ -33,6 +33,10 @@ void CelestialBody::setOrbit(float orbRadius, float orbSpeed) {
     orbitSpeed = orbSpeed * 50;
 }
 
+void CelestialBody::setRotationSpeed(float speed) {
+    rotationSpeed = speed;
+}
+
 void CelestialBody::setParent(CelestialBody* parentBody) {
     parent = parentBody;
 }

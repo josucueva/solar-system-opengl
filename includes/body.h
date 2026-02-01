@@ -38,6 +38,7 @@ public:
     CelestialBody(float rad, const char* texturePath);
     virtual ~CelestialBody();
     void setOrbit(float orbRadius, float orbSpeed);
+    void setRotationSpeed(float speed);
     void setParent(CelestialBody* parentBody);
     virtual void update(float deltaTime);
     virtual void render(Shader& shader, const glm::mat4& view, const glm::mat4& projection);

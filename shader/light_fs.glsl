@@ -10,10 +10,10 @@ uniform vec3 sunPos;
 
 void main()
 {
-    // Calculate texture coordinates using Normal (rotates with object)
-    vec3 normalizedNormal = normalize(Normal);
-    float u = 0.5 + atan(normalizedNormal.z, normalizedNormal.x) / (2.0 * 3.14159265359);
-    float v = 0.5 - asin(normalizedNormal.y) / 3.14159265359;
+    // Calculate texture coordinates using LocalPos (rotates with object)
+    vec3 normalizedPos = normalize(LocalPos);
+    float u = 0.5 + atan(normalizedPos.z, normalizedPos.x) / (2.0 * 3.14159265359);
+    float v = 0.5 - asin(normalizedPos.y) / 3.14159265359;
     vec2 texCoords = vec2(u, v);
     
     // Get texture color
@@ -24,7 +24,7 @@ void main()
     vec3 l = normalize(sunPos - FragPos);
     
     // Ambient (very low)
-    float ka = 0.05;
+    float ka = 0.08 ;
     
     // Diffuse
     float kd = 0.95;

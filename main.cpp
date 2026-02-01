@@ -48,6 +48,7 @@ struct PlanetData {
     float orbitRadius;
     float size;
     std::string texture;
+    float rotationSpeed;
 };
 
 std::vector<PlanetData> loadPlanetsFromCSV(const std::string& filepath);
@@ -77,6 +78,8 @@ int main() {
     Shader textureShader("shader/texture_vs.glsl", "shader/texture_fs.glsl");
 
     CelestialBody sun(SUN_SIZE, SUN_TEXTURE);
+    sun.setRotationSpeed(10.0f);  // Sol con rotación lenta
+    
     CelestialBody background(BACKGROUND_SIZE, BACKGROUND_TEXTURE);
 
     std::vector<PlanetData> planetsData = loadPlanetsFromCSV("assets/data/planets.csv");
@@ -86,6 +89,7 @@ int main() {
     for (const auto& planetData : planetsData) {
         CelestialBody* planet = new CelestialBody(planetData.size, planetData.texture.c_str());
         planet->setOrbit(planetData.orbitRadius, planetData.orbitSpeed);
+        planet->setRotationSpeed(planetData.rotationSpeed);
         planets.push_back(planet);
         
         if (planetData.name == "Earth") {
@@ -95,6 +99,7 @@ int main() {
     
     CelestialBody moon(MOON_SIZE, MOON_TEXTURE);
     moon.setOrbit(MOON_ORBIT_RADIUS, MOON_ORBIT_SPEED);
+    moon.setRotationSpeed(50.0f);  // Luna con rotación
     if (earthPtr) {
         moon.setParent(earthPtr);
     }
@@ -267,6 +272,8 @@ std::vector<PlanetData> loadPlanetsFromCSV(const std::string& filepath) {
         std::getline(ss, token, ',');
         planet.size = std::stof(token);
         std::getline(ss, planet.texture, ',');
+        std::getline(ss, token, ',');
+        planet.rotationSpeed = std::stof(token);
         
         planets.push_back(planet);
     }
