@@ -28,7 +28,7 @@ const char *SUN_TEXTURE = "assets/textures/2k_sun.jpg";
 
 // background properties
 const float BACKGROUND_SIZE = 8000.0f;
-const char *BACKGROUND_TEXTURE = "assets/textures/2k_stars_milky_way.jpg";
+const char *BACKGROUND_TEXTURE = "assets/textures/8k_stars_milky_way.jpg";
 
 // moon properties
 const float MOON_SIZE = 0.273f * PLANET_SIZE_SCALE;
