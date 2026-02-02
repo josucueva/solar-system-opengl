@@ -52,7 +52,11 @@ This project demonstrates the creation of a simple solar system simulation using
 ## Controls
 
 - `W`, `A`, `S`, `D`: Move the camera forward, left, backward, and right
+- `Left Shift`: Boost camera speed (fast movement)
+- `Left Ctrl`: Slow camera speed (precise movement)
+- `Shift + H`: Toggle orbit visibility
 - Mouse movement: Look around
+- Mouse scroll: Zoom in/out
 - `ESC`: Exit the application
 
 ## Credits
