@@ -34,7 +34,7 @@ public:
   void setTilt(float angle);
   void setRotation(float angle);
   void setPosition(const vec3 &pos);
-  void update(float deltaTime, const vec3 &parentPos, float parentRotation);
+  void update(const vec3 &parentPos, float parentRotation);
   void render(Shader &shader, const mat4 &view, const mat4 &projection);
 };
 

@@ -129,7 +129,8 @@ int main() {
   // Create Saturn's rings
   Ring *saturnRings = nullptr;
   if (saturnPtr) {
-    // Saturn's rings: inner radius ~1.2x planet radius, outer radius ~2.3x planet radius
+    // Saturn's rings: inner radius ~1.2x planet radius, outer radius ~2.3x
+    // planet radius
     float saturnRadius = 9.45f * PLANET_SIZE_SCALE;
     saturnRings = new Ring(saturnRadius * 1.2f, saturnRadius * 2.3f,
                            "assets/textures/2k_saturn_ring_alpha.png");
@@ -201,7 +202,7 @@ int main() {
 
     // render Saturn's rings
     if (saturnRings && saturnPtr) {
-      saturnRings->update(deltaTime, saturnPtr->getPosition(), 0.0f);
+      saturnRings->update(saturnPtr->getPosition(), 0.0f);
       saturnRings->render(ringShader, view, projection);
     }
 

@@ -35,8 +35,7 @@ void Ring::setRotation(float angle) { rotationAngle = angle; }
 
 void Ring::setPosition(const vec3 &pos) { position = pos; }
 
-void Ring::update(float deltaTime, const vec3 &parentPos,
-                  float parentRotation) {
+void Ring::update(const vec3 &parentPos, float parentRotation) {
   position = parentPos;
   rotationAngle = parentRotation;
 }
@@ -83,7 +82,7 @@ void Ring::createRingGeometry(float *&vertices, int &vertexCount,
     float sinA = sinf(angle);
 
     // Inner vertex
-    vertices[vIndex++] = innerRadius * cosA; // x
+    vertices[vIndex++] = innerRadius * cosA;  // x
     vertices[vIndex++] = 0.0f;                // y
     vertices[vIndex++] = innerRadius * sinA;  // z
     vertices[vIndex++] = 0.0f;                // nx
@@ -93,13 +92,13 @@ void Ring::createRingGeometry(float *&vertices, int &vertexCount,
     vertices[vIndex++] = (float)i / SEGMENTS; // v
 
     // Outer vertex
-    vertices[vIndex++] = outerRadius * cosA; // x
-    vertices[vIndex++] = 0.0f;               // y
-    vertices[vIndex++] = outerRadius * sinA; // z
-    vertices[vIndex++] = 0.0f;               // nx
-    vertices[vIndex++] = 1.0f;               // ny
-    vertices[vIndex++] = 0.0f;               // nz
-    vertices[vIndex++] = 1.0f;               // u (outer edge)
+    vertices[vIndex++] = outerRadius * cosA;  // x
+    vertices[vIndex++] = 0.0f;                // y
+    vertices[vIndex++] = outerRadius * sinA;  // z
+    vertices[vIndex++] = 0.0f;                // nx
+    vertices[vIndex++] = 1.0f;                // ny
+    vertices[vIndex++] = 0.0f;                // nz
+    vertices[vIndex++] = 1.0f;                // u (outer edge)
     vertices[vIndex++] = (float)i / SEGMENTS; // v
   }
 
@@ -143,8 +142,7 @@ void Ring::setupMesh(const float *vertices, int vertexCount,
                indices, GL_STATIC_DRAW);
 
   // Position attribute
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
-                        (void *)0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
   glEnableVertexAttribArray(0);
 
   // Normal attribute
