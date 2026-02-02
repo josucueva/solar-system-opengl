@@ -35,7 +35,8 @@ CelestialBody::~CelestialBody() {
 }
 
 void CelestialBody::setOrbit(float orbRadius, float orbSpeed) {
-  orbitRadius = orbRadius;
+  // scale AU values to visible OpenGL units (1 AU → 100 units)
+  orbitRadius = orbRadius * 100;
   orbitSpeed = orbSpeed;
 }
 

@@ -33,10 +33,10 @@ const float SPEED_SCALE = 1.0f;
 const float BACKGROUND_SIZE = 500.0f;
 const char *BACKGROUND_TEXTURE = "assets/textures/2k_stars_milky_way.jpg";
 
-// moon properties
-const float MOON_SIZE = 0.0243f * PLANET_SIZE_SCALE;
-const float MOON_ORBIT_RADIUS = 0.0025f * DISTANCE_SCALE;
-const float MOON_ORBIT_SPEED = 1.0f * SPEED_SCALE;
+// moon properties (relative to Earth)
+const float MOON_SIZE = 0.273f * PLANET_SIZE_SCALE;
+const float MOON_ORBIT_RADIUS = 0.087f;
+const float MOON_ORBIT_SPEED = 13.4f;
 const char *MOON_TEXTURE = "assets/textures/2k_moon.jpg";
 
 // orbit rendering
@@ -152,6 +152,9 @@ int main() {
   moon.setOrbit(MOON_ORBIT_RADIUS, MOON_ORBIT_SPEED);
   moon.setRotationSpeed(50.0f);
   moon.setMaterial(ROCKY_KA, ROCKY_KD, ROCKY_KS, ROCKY_SHININESS);
+
+  Orbit *moonOrbit = new Orbit(MOON_ORBIT_RADIUS * 100, ORBIT_COLOR);
+
   if (earthPtr) {
     moon.setParent(earthPtr);
   }
@@ -186,6 +189,12 @@ int main() {
       for (auto *orbit : orbits) {
         orbit->render(orbitShader, view, projection);
       }
+
+      if (earthPtr) {
+        mat4 moonOrbitModel = mat4(1.0f);
+        moonOrbitModel = translate(moonOrbitModel, earthPtr->getPosition());
+        moonOrbit->render(orbitShader, view, projection, moonOrbitModel);
+      }
     }
 
     // setup lighting from sun
@@ -219,6 +228,8 @@ int main() {
   for (auto *orbit : orbits) {
     delete orbit;
   }
+
+  delete moonOrbit;
 
   glfwTerminate();
   return 0;

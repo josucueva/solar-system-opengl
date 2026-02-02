@@ -43,10 +43,8 @@ void Orbit::setupOrbit() {
 }
 
 void Orbit::render(Shader &shader, const glm::mat4 &view,
-                   const glm::mat4 &projection) {
+                   const glm::mat4 &projection, const glm::mat4 &model) {
   shader.use();
-
-  glm::mat4 model = glm::mat4(1.0f);
 
   shader.setMat4("model", model);
   shader.setMat4("view", view);
