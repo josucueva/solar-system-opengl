@@ -14,8 +14,8 @@
 #include "shader.h"
 #include "texture.h"
 
-#define WINDOW_WIDTH 700
-#define WINDOW_HEIGHT 700
+#define INITIAL_WINDOW_WIDTH 700
+#define INITIAL_WINDOW_HEIGHT 700
 
 using namespace std;
 using namespace glm;
@@ -61,10 +61,13 @@ const vec3 GAS_KS = vec3(0.5f, 0.5f, 0.5f);
 const float GAS_SHININESS = 64.0f;
 
 Camera camera(vec3(0.0f, 0.0f, 3.0f));
-float lastX = WINDOW_WIDTH / 2.0f;
-float lastY = WINDOW_HEIGHT / 2.0f;
+float lastX = INITIAL_WINDOW_WIDTH / 2.0f;
+float lastY = INITIAL_WINDOW_HEIGHT / 2.0f;
 bool firstMouse = true;
 bool hKeyPressed = false;
+
+int currentWidth = INITIAL_WINDOW_WIDTH;
+int currentHeight = INITIAL_WINDOW_HEIGHT;
 
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
@@ -91,7 +94,8 @@ void processInput(GLFWwindow *window);
 
 int main() {
 
-  GLFWwindow *window = initWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Solar System");
+  GLFWwindow *window =
+      initWindow(INITIAL_WINDOW_WIDTH, INITIAL_WINDOW_HEIGHT, "Solar System");
   if (!window) {
     return -1;
   }
@@ -170,7 +174,7 @@ int main() {
     mat4 view = camera.GetViewMatrix();
     mat4 projection =
         perspective(radians(camera.Zoom),
-                    (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 1.0f, 20000.0f);
+                    (float)currentWidth / (float)currentHeight, 1.0f, 20000.0f);
 
     // render background
     glDepthMask(GL_FALSE);
@@ -325,6 +329,8 @@ void processInput(GLFWwindow *window) {
 
 void framebufferSizeCallback(GLFWwindow * /* window */, int width, int height) {
   glViewport(0, 0, width, height);
+  currentWidth = width;
+  currentHeight = height;
 }
 
 void mouseCallback(GLFWwindow * /* window */, double xposIn, double yposIn) {
