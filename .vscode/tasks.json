@@ -2,13 +2,43 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "g++ build",
+      "label": "g++ build project",
       "type": "shell",
       "command": "g++",
       "args": [
-        "${workspaceFolder}/main.cpp",
+        "-std=c++11",
+        "-Wall",
+        "-Wextra",
+        "-Iinclude",
+        "-Iexternal",
+        "${workspaceFolder}/src/main.cpp",
+        "${workspaceFolder}/src/shader.cpp",
+        "${workspaceFolder}/src/texture.cpp",
+        "${workspaceFolder}/src/body.cpp",
+        "${workspaceFolder}/src/orbit.cpp",
         "-o",
-        "${workspaceFolder}/main",
+        "${workspaceFolder}/bin/solar_system",
+        "-lGLEW",
+        "-lGL",
+        "-lglfw"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": ["$gcc"]
+    },
+    {
+      "label": "g++ build (old main)",
+      "type": "shell",
+      "command": "g++",
+      "args": [
+        "-std=c++11",
+        "-Iinclude",
+        "-Iexternal",
+        "${workspaceFolder}/src/main.cpp",
+        "-o",
+        "${workspaceFolder}/bin/main",
         "-lGLEW",
         "-lGL",
         "-lglfw"
@@ -26,6 +56,8 @@
       "args": [
         "-fdiagnostics-color=always",
         "-g",
+        "-Iinclude",
+        "-Iexternal",
         "${file}",
         "-o",
         "${fileDirname}/${fileBasenameNoExtension}",
