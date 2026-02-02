@@ -6,7 +6,7 @@ endif
 
 CXX := g++
 CXXFLAGS := -std=c++11 -Wall -Wextra -Iinclude -Iexternal
-SRCS := src/main.cpp src/shader.cpp src/texture.cpp src/body.cpp src/orbit.cpp
+SRCS := src/main.cpp src/shader.cpp src/texture.cpp src/body.cpp src/orbit.cpp src/ring.cpp
 OBJS := $(patsubst src/%.cpp,build/%.o,$(SRCS))
 
 ifeq ($(DETECTED_OS),Windows)
