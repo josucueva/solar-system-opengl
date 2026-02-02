@@ -12,6 +12,7 @@
 #include "camera.h"
 #include "config.h"
 #include "orbit.h"
+#include "ring.h"
 #include "shader.h"
 #include "texture.h"
 
@@ -71,6 +72,7 @@ int main() {
   Shader colorShader("shaders/colors_vs.glsl", "shaders/colors_fs.glsl");
   Shader textureShader("shaders/texture_vs.glsl", "shaders/texture_fs.glsl");
   Shader orbitShader("shaders/orbit_vs.glsl", "shaders/orbit_fs.glsl");
+  Shader ringShader("shaders/ring_vs.glsl", "shaders/ring_fs.glsl");
 
   CelestialBody sun(SUN_SIZE * PLANET_SIZE_SCALE, SUN_TEXTURE);
   sun.setRotationSpeed(10.0f);
@@ -82,6 +84,7 @@ int main() {
   vector<CelestialBody *> planets;
   vector<Orbit *> orbits;
   CelestialBody *earthPtr = nullptr;
+  CelestialBody *saturnPtr = nullptr;
 
   for (const auto &planetData : planetsData) {
     CelestialBody *planet = new CelestialBody(
@@ -107,6 +110,9 @@ int main() {
     if (planetData.name == "Earth") {
       earthPtr = planet;
     }
+    if (planetData.name == "Saturn") {
+      saturnPtr = planet;
+    }
   }
 
   CelestialBody moon(MOON_SIZE, MOON_TEXTURE);
@@ -118,6 +124,16 @@ int main() {
 
   if (earthPtr) {
     moon.setParent(earthPtr);
+  }
+
+  // Create Saturn's rings
+  Ring *saturnRings = nullptr;
+  if (saturnPtr) {
+    // Saturn's rings: inner radius ~1.2x planet radius, outer radius ~2.3x planet radius
+    float saturnRadius = 9.45f * PLANET_SIZE_SCALE;
+    saturnRings = new Ring(saturnRadius * 1.2f, saturnRadius * 2.3f,
+                           "assets/textures/2k_saturn_ring_alpha.png");
+    saturnRings->setTilt(26.7f); // Saturn's axial tilt
   }
 
   while (!glfwWindowShouldClose(window)) {
@@ -183,6 +199,12 @@ int main() {
     moon.update(deltaTime);
     moon.render(lightShader, view, projection);
 
+    // render Saturn's rings
+    if (saturnRings && saturnPtr) {
+      saturnRings->update(deltaTime, saturnPtr->getPosition(), 0.0f);
+      saturnRings->render(ringShader, view, projection);
+    }
+
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
@@ -196,6 +218,7 @@ int main() {
   }
 
   delete moonOrbit;
+  delete saturnRings;
 
   glfwTerminate();
   return 0;
