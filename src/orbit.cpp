@@ -49,6 +49,9 @@ void Orbit::render(Shader &shader, const mat4 &view, const mat4 &projection,
                    const mat4 &model) {
   shader.use();
 
+  // send transformation matrices to shader
+  // model places the orbit in world space
+  // view and projection transform to camera and clip space
   shader.setMat4("model", model);
   shader.setMat4("view", view);
   shader.setMat4("projection", projection);

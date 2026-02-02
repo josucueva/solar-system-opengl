@@ -82,10 +82,15 @@ void CelestialBody::render(Shader &shader, const mat4 &view,
 
   shader.use();
 
+  // model matrix: transforms from object space to world space
+  // this positions and rotates each planet/moon in the solar system
   mat4 model = mat4(1.0f);
-  model = translate(model, position);
-  model = rotate(model, radians(rotationAngle), vec3(0.0f, 1.0f, 0.0f));
+  model = translate(model, position); // move to position in the world
+  model = rotate(model, radians(rotationAngle),
+                 vec3(0.0f, 1.0f, 0.0f)); // spin the planet
 
+  // send all transformation matrices to the shader
+  // vertices will go: object space -> world space -> camera space -> clip space
   shader.setMat4("model", model);
   shader.setMat4("view", view);
   shader.setMat4("projection", projection);
@@ -135,7 +140,8 @@ void CelestialBody::setupMesh(const Vertex *vertices, int vertexCount,
 Vertex *CelestialBody::createSphereVertices(vec3 center, float radius,
                                             int stackCount, int sectorCount,
                                             int &vertexCount) {
-
+  // creates sphere vertices in object space (centered at origin)
+  // these will later be transformed to world space using the model matrix
   vertexCount = (stackCount + 1) * (sectorCount + 1);
   Vertex *vertices = new Vertex[vertexCount];
 

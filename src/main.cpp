@@ -131,11 +131,16 @@ int main() {
     glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    // view matrix: transforms world space to camera space
+    // moves the whole solar system as if the camera is moving around
     mat4 view = camera.GetViewMatrix();
-    mat4 projection = perspective(radians(camera.Zoom),
-                                  (float)currentWidth / (float)currentHeight,
-                                  NEAR_PLANE, FAR_PLANE);
 
+    // projection matrix: transforms camera space to clip space
+    // adds perspective so far away planets look smaller
+    mat4 projection =
+        perspective(radians(camera.Zoom),                       // field of view
+                    (float)currentWidth / (float)currentHeight, // aspect ratio
+                    NEAR_PLANE, FAR_PLANE);
     // render background
     glDepthMask(GL_FALSE);
     background.render(textureShader, view, projection);
