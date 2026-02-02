@@ -6,12 +6,14 @@ This project demonstrates the creation of a simple solar system simulation using
 
 ## Structure
 
-- `main.cpp`: Main application file containing OpenGL setup, rendering loop, and solar system logic
-- `Makefile`: Build configuration file for compiling the project
-- `shader/`: Directory containing vertex and fragment shader source files
-- `assets/`: Directory containing textures and other assets used in the application
-- `includes/`: Directory containing header files for utility functions and classes
-- `model/`: Directory containing model files
+- `src/`: Source files (.cpp)
+- `include/`: Header files (.h)
+- `external/`: External header files and libraries
+- `shaders/`: GLSL shader files
+- `assets/`: Resources like textures and data files
+- `build/`: Compiled object files (.o)
+- `bin/`: Executable output
+- `Makefile`: Build configuration for cross-platform compilation
 
 ## Features
 
