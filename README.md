@@ -1,4 +1,4 @@
-# solar-system-opengl
+# Solar System with OpenGL
 
 A solar system model made purely with C++ with OpenGL.
 
