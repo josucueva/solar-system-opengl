@@ -1,6 +1,6 @@
 # Solar System with OpenGL
 
-A solar system model made purely with C++ with OpenGL.
+A solar system model made purely in C++ with OpenGL.
 
 This project demonstrates the creation of a simple solar system simulation using OpenGL for rendering. It features textured spheres representing planets orbiting around a central sun, with basic lighting and camera controls. This project followed the tutorials from [LearnOpenGL](https://learnopengl.com/) and adapted them to create a solar system model.
 
