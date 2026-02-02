@@ -5,7 +5,10 @@
 
 #define PI 3.14159265358979323846
 
-Orbit::Orbit(float orbitRadius, const glm::vec3 &orbitColor)
+using namespace std;
+using namespace glm;
+
+Orbit::Orbit(float orbitRadius, const vec3 &orbitColor)
     : vertexCount(SEGMENTS), radius(orbitRadius), color(orbitColor) {
   setupOrbit();
 }
@@ -42,8 +45,8 @@ void Orbit::setupOrbit() {
   delete[] vertices;
 }
 
-void Orbit::render(Shader &shader, const glm::mat4 &view,
-                   const glm::mat4 &projection, const glm::mat4 &model) {
+void Orbit::render(Shader &shader, const mat4 &view, const mat4 &projection,
+                   const mat4 &model) {
   shader.use();
 
   shader.setMat4("model", model);

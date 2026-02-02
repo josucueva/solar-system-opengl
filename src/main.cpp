@@ -21,7 +21,7 @@ using namespace std;
 using namespace glm;
 
 // sun properties
-const float SUN_SIZE = 1.0f;
+const float SUN_SIZE = 2.0f;
 const char *SUN_TEXTURE = "assets/textures/2k_sun.jpg";
 
 // scale configuration
@@ -30,7 +30,7 @@ const float DISTANCE_SCALE = 1.0f;
 const float SPEED_SCALE = 1.0f;
 
 // background properties
-const float BACKGROUND_SIZE = 500.0f;
+const float BACKGROUND_SIZE = 8000.0f;
 const char *BACKGROUND_TEXTURE = "assets/textures/2k_stars_milky_way.jpg";
 
 // moon properties (relative to Earth)
@@ -41,7 +41,7 @@ const char *MOON_TEXTURE = "assets/textures/2k_moon.jpg";
 
 // orbit rendering
 const vec3 ORBIT_COLOR = vec3(1.0f, 1.0f, 1.0f);
-const bool DRAW_ORBITS = true;
+bool drawOrbits = false;
 
 // sun light intensities
 const vec3 LIGHT_AMBIENT = vec3(0.15f, 0.15f, 0.15f);
@@ -64,6 +64,7 @@ Camera camera(vec3(0.0f, 0.0f, 3.0f));
 float lastX = WINDOW_WIDTH / 2.0f;
 float lastY = WINDOW_HEIGHT / 2.0f;
 bool firstMouse = true;
+bool hKeyPressed = false;
 
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
@@ -107,7 +108,6 @@ int main() {
   Shader textureShader("shaders/texture_vs.glsl", "shaders/texture_fs.glsl");
   Shader orbitShader("shaders/orbit_vs.glsl", "shaders/orbit_fs.glsl");
 
-  // scale sun size for visibility (sun is actually 109x Earth diameter)
   CelestialBody sun(SUN_SIZE * PLANET_SIZE_SCALE, SUN_TEXTURE);
   sun.setRotationSpeed(10.0f);
 
@@ -120,11 +120,9 @@ int main() {
   CelestialBody *earthPtr = nullptr;
 
   for (const auto &planetData : planetsData) {
-    // apply size scaling for visibility
     CelestialBody *planet = new CelestialBody(
         planetData.size * PLANET_SIZE_SCALE, planetData.texture.c_str());
 
-    // apply distance and speed scaling
     planet->setOrbit(planetData.orbitRadius * DISTANCE_SCALE,
                      planetData.orbitSpeed * SPEED_SCALE);
     planet->setRotationSpeed(planetData.rotationSpeed);
@@ -138,7 +136,6 @@ int main() {
 
     planets.push_back(planet);
 
-    // create orbit path
     Orbit *orbit =
         new Orbit(planetData.orbitRadius * DISTANCE_SCALE * 100, ORBIT_COLOR);
     orbits.push_back(orbit);
@@ -173,7 +170,7 @@ int main() {
     mat4 view = camera.GetViewMatrix();
     mat4 projection =
         perspective(radians(camera.Zoom),
-                    (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 2000.0f);
+                    (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 1.0f, 20000.0f);
 
     // render background
     glDepthMask(GL_FALSE);
@@ -185,7 +182,7 @@ int main() {
     sun.render(textureShader, view, projection);
 
     // render orbit paths
-    if (DRAW_ORBITS) {
+    if (drawOrbits) {
       for (auto *orbit : orbits) {
         orbit->render(orbitShader, view, projection);
       }
@@ -295,6 +292,27 @@ bool initGLEW() {
 void processInput(GLFWwindow *window) {
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     glfwSetWindowShouldClose(window, true);
+
+  // camera movement speed control
+  if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+    camera.MovementSpeed = 50.0f; // boost speed
+  else if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+    camera.MovementSpeed = 0.5f; // slow speed
+  else
+    camera.MovementSpeed = 2.5f; // normal speed
+
+  // toggle orbit visibility with shift + h
+  if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS &&
+      glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS) {
+    if (!hKeyPressed) {
+      drawOrbits = !drawOrbits;
+      hKeyPressed = true;
+    }
+  } else if (glfwGetKey(window, GLFW_KEY_H) == GLFW_RELEASE) {
+    hKeyPressed = false;
+  }
+
+  // camera movement
   if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
     camera.ProcessKeyboard(FORWARD, deltaTime);
   if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
