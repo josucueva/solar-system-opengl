@@ -46,7 +46,7 @@ This project demonstrates the creation of a simple solar system simulation using
    ```
 4. Run the application:
    ```bash
-   ./solar-system
+   ./bin/solar-system
    ```
 
 ## Controls
