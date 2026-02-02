@@ -10,57 +10,17 @@
 
 #include "body.h"
 #include "camera.h"
+#include "config.h"
 #include "orbit.h"
 #include "shader.h"
 #include "texture.h"
 
-#define INITIAL_WINDOW_WIDTH 700
-#define INITIAL_WINDOW_HEIGHT 700
-
 using namespace std;
 using namespace glm;
 
-// sun properties
-const float SUN_SIZE = 2.0f;
-const char *SUN_TEXTURE = "assets/textures/2k_sun.jpg";
-
-// scale configuration
-const float PLANET_SIZE_SCALE = 1.0f;
-const float DISTANCE_SCALE = 1.0f;
-const float SPEED_SCALE = 1.0f;
-
-// background properties
-const float BACKGROUND_SIZE = 8000.0f;
-const char *BACKGROUND_TEXTURE = "assets/textures/2k_stars_milky_way.jpg";
-
-// moon properties (relative to Earth)
-const float MOON_SIZE = 0.273f * PLANET_SIZE_SCALE;
-const float MOON_ORBIT_RADIUS = 0.087f;
-const float MOON_ORBIT_SPEED = 13.4f;
-const char *MOON_TEXTURE = "assets/textures/2k_moon.jpg";
-
-// orbit rendering
-const vec3 ORBIT_COLOR = vec3(1.0f, 1.0f, 1.0f);
 bool drawOrbits = false;
 
-// sun light intensities
-const vec3 LIGHT_AMBIENT = vec3(0.15f, 0.15f, 0.15f);
-const vec3 LIGHT_DIFFUSE = vec3(1.0f, 1.0f, 1.0f);
-const vec3 LIGHT_SPECULAR = vec3(1.0f, 1.0f, 1.0f);
-
-// rocky planet material
-const vec3 ROCKY_KA = vec3(0.25f, 0.25f, 0.25f);
-const vec3 ROCKY_KD = vec3(0.8f, 0.8f, 0.8f);
-const vec3 ROCKY_KS = vec3(0.3f, 0.3f, 0.3f);
-const float ROCKY_SHININESS = 32.0f;
-
-// gas giant material
-const vec3 GAS_KA = vec3(0.3f, 0.3f, 0.3f);
-const vec3 GAS_KD = vec3(0.9f, 0.9f, 0.9f);
-const vec3 GAS_KS = vec3(0.5f, 0.5f, 0.5f);
-const float GAS_SHININESS = 64.0f;
-
-Camera camera(vec3(0.0f, 0.0f, 3.0f));
+Camera camera(CAMERA_START_POSITION);
 float lastX = INITIAL_WINDOW_WIDTH / 2.0f;
 float lastY = INITIAL_WINDOW_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -172,9 +132,9 @@ int main() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     mat4 view = camera.GetViewMatrix();
-    mat4 projection =
-        perspective(radians(camera.Zoom),
-                    (float)currentWidth / (float)currentHeight, 1.0f, 20000.0f);
+    mat4 projection = perspective(radians(camera.Zoom),
+                                  (float)currentWidth / (float)currentHeight,
+                                  NEAR_PLANE, FAR_PLANE);
 
     // render background
     glDepthMask(GL_FALSE);
